@@ -15,6 +15,12 @@ namespace Snake
             this.y = y;
         }
 
+        // Copy constructor — creates an independent clone of another Coord
+        public Coord(Coord other) : this(other.x, other.y) { }
+
+        // Required whenever Equals is overridden — equal objects must have equal hash codes
+        public override int GetHashCode() => HashCode.Combine(x, y);
+
         public override bool Equals(object? obj)
         {
             if(obj == null || !GetType().Equals(obj.GetType()))
