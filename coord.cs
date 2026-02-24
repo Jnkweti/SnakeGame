@@ -3,23 +3,23 @@ namespace Snake
 {
     internal class Coord
     {
-        private int x;
-        private int y;
 
-        public int X{get{return x;} set;}
-        public int Y{get{return y;} set;}
-
+        public int X { get; set ; }
+    
+        public int Y { get;  set; }
+        
         public Coord(int x, int y)
         {
-            this.x = x;
-            this.y = y;
+            this.X = x;
+            this.Y = y;
+
         }
 
         // Copy constructor — creates an independent clone of another Coord
-        public Coord(Coord other) : this(other.x, other.y) { }
+        public Coord(Coord other) : this(other.X, other.Y) { }
 
         // Required whenever Equals is overridden — equal objects must have equal hash codes
-        public override int GetHashCode() => HashCode.Combine(x, y);
+        public override int GetHashCode() => HashCode.Combine(X, Y);
 
         public override bool Equals(object? obj)
         {
@@ -30,7 +30,7 @@ namespace Snake
 
             Coord other = (Coord)obj;
 
-            return x == other.x && y == other.y;
+            return X == other.X && Y == other.Y;
         }
 
         public void ApplyMovementDirection(Direction direction)
@@ -38,16 +38,16 @@ namespace Snake
             switch (direction)
             {
                 case Direction.Left:
-                    x--;
+                    X--;
                     break;
                 case Direction.Right:
-                    x++;
+                    X++;
                     break;
                 case Direction.Up:
-                    y--;
+                    Y--;
                     break;
                 case Direction.Down:
-                    y++;
+                    Y++;
                     break;
             }
         }
