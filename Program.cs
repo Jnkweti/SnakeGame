@@ -76,7 +76,7 @@ while (run)
 
         askUser:
         Console.WriteLine("Play Again?\n1)Yes\n2)No");
-        String choice = Console.ReadLine();
+        String choice = Console.ReadLine() ?? "";
         switch (choice.ToLower())
         {
             case "1":
@@ -114,7 +114,7 @@ while (run)
 
     DateTime time = DateTime.Now;
 
-    while((DateTime.Now - time).Milliseconds < frameDelayMilli)
+    while((DateTime.Now - time).TotalMilliseconds < frameDelayMilli)
     {
         if (Console.KeyAvailable)
         {
