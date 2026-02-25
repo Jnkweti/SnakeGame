@@ -1,54 +1,47 @@
-﻿// See https://aka.ms/new-console-template for more information
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Security.AccessControl;
-using System.Text;
+﻿using System.Diagnostics;
 using Snake;
+using Snake.Entities;
 
-Coord gridDim = new Coord(50, 20);
 
-Coord snakePos = new Coord(10, 1);
-
+Coord gridDim = new Coord(50,20);
 Random rand = new Random();
 
-Coord applePos = new Coord(rand.Next(1, gridDim.X -1), rand.Next(1, gridDim.Y -1));
+SnakeEntity snake = new SnakeEntity(new Coord(10, 5));
+Coord applePos = new Coord(rand.Next(1, gridDim.X -1),  rand.Next(1, gridDim.Y));
 
-Direction movement = Direction.Down;
-
-int frameDelayMilli = 100;
-
-StringBuilder snake = new StringBuilder("■");
-
-List<Coord> snakePosHis = new List<Coord>();
-int tailLength = 1;
+GameState gameState;
 
 int score = 0;
+int frameDelayMilli = 100;
+bool run = true;
 
-Boolean run = true;
 
 while (run)
 {
+    //check to see if snake eats apple
+    bool ate = snake.Body[0].Equals(applePos);
+    snake.Tick(ate);
+    if (ate) { score++; applePos = new Coord(rand.Next(1, gridDim.X - 1), rand.Next(1, gridDim.Y - 1)); }
     Console.Clear();
-    Console.WriteLine("Score: " + score);
-    snakePos.ApplyMovementDirection(movement);
-    for(int y = 0; y < gridDim.Y; y++)
+    for (int y = 0; y <= gridDim.Y; y++)
     {
-        for(int x = 0; x<gridDim.X; x++)
+        for (int x = 0; x <= gridDim.X; x++)
         {
-            Coord currentCo = new Coord(x, y);
-            if(snakePos.Equals(currentCo) || snakePosHis.Contains(currentCo))
+            if(snake.Body.Contains(new Coord(x, y)))
             {
-                Console.Write(snake);
+                        Console.Write("■");
             }
-            else if (applePos.Equals(currentCo))
+            else if (applePos.X == x && applePos.Y == y)
             {
                 Console.Write("0");
             }
-            else if(x == 0 || y == 0 || x == gridDim.X -1 || y == gridDim.Y - 1)
+            else if (y == gridDim.Y - 1 || y == 0)
             {
                 Console.Write("#");
-                
+            }
+            else if(x == gridDim.X - 1 || x == 0)
+            {
+                Console.Write("||");
             }
             else
             {
@@ -56,91 +49,45 @@ while (run)
             }
             
         }
-
         Console.WriteLine();
     }
-
-    if (snakePos.Equals(applePos))
+    //Checks for Snake out of bounds of self collision
+    if ( snake.Body[0].X <= 0 || snake.Body[0].X >= gridDim.X || 
+         snake.Body[0].Y <= 0 || snake.Body[0].Y >= gridDim.Y || 
+         snake.CollideWithSelf())
     {
-        tailLength++;
-        score++;
-        applePos = new Coord(rand.Next(1, gridDim.X -1), rand.Next(1, gridDim.Y -1));
-
+        gameState = GameState.GameOver;
+        Console.Write("Game Over");
+        run = false;
     }
-    if(snakePos.X >= gridDim.X || snakePos.X < 1 || snakePos.Y >= gridDim.Y || snakePos.Y < 1
-    || snakePosHis.Contains(snakePos))
-    {
-        Console.Clear();
-        Console.WriteLine("GAME OVER!");
-        Console.WriteLine("Score: " + score);
-
-        askUser:
-        Console.WriteLine("Play Again?\n1)Yes\n2)No");
-        String choice = Console.ReadLine() ?? "";
-        switch (choice.ToLower())
-        {
-            case "1":
-                score = 0;
-                tailLength = 1;
-                snakePos = new Coord(10, 1);
-                snakePosHis.Clear();
-                movement = Direction.Down;
-                continue;
-            case "yes":
-                score = 0;
-                tailLength = 1;
-                snakePos = new Coord(10, 1);
-                snakePosHis.Clear();
-                movement = Direction.Down;
-                continue;
-            case "2":
-                run = false;
-                break;
-            case "no":
-                run = false;
-                break;
-            default:
-                goto askUser;
-
-        }
-    }
-
-    snakePosHis.Add(new Coord(snakePos.X, snakePos.Y));
-
-    if(snakePosHis.Count > tailLength)
-    {
-        snakePosHis.RemoveAt(0);
-    }
-
     DateTime time = DateTime.Now;
 
-    while((DateTime.Now - time).TotalMilliseconds < frameDelayMilli)
+    while ((DateTime.Now - time).TotalMilliseconds < frameDelayMilli)
     {
         if (Console.KeyAvailable)
         {
             ConsoleKey key = Console.ReadKey().Key;
-        
-        switch (key)
-        {
-            case ConsoleKey.LeftArrow:
-                movement = Direction.Left;
-                break;
-            case ConsoleKey.RightArrow:
-                movement = Direction.Right;
-                break;
-            case ConsoleKey.UpArrow:
-                movement = Direction.Up;
-                break;
-            case ConsoleKey.DownArrow:
-                movement = Direction.Down;
-                break;
-        }
-    
+            
+            switch (key)
+            {
+                case ConsoleKey.LeftArrow:
+                    snake.QueueDirection(Direction.Left);
+                    break;
+                case ConsoleKey.RightArrow:
+                    snake.QueueDirection(Direction.Right);
+                    break;
+                case ConsoleKey.UpArrow:
+                    snake.QueueDirection(Direction.Up);
+                    break;
+                case ConsoleKey.DownArrow:
+                    snake.QueueDirection(Direction.Down);
+                    break;
+            }
+            
         }
     }
-  
-}
-// Console.Clear();
+    
 
-Console.WriteLine("GAME OVER!");
-Console.WriteLine("Score: " + score);
+
+
+}

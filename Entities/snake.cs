@@ -10,9 +10,9 @@ internal sealed class SnakeEntity
 {
     public List<Coord> Body { get; } = new();
 
-    public Coord PreviousHead { get; private set; }
+    public Coord PreviousHead { get; set; }
 
-    public Direction CurrentDirection { get; private set; } = Direction.Right;
+    public Direction CurrentDirection { get;  set; } = Direction.Right;
 
     private Direction _nextDirection = Direction.Right;
 
@@ -30,7 +30,7 @@ internal sealed class SnakeEntity
             _nextDirection = d;
     }
 
-    public void tick(bool growing)
+    public void Tick(bool growing)
     {
         PreviousHead = new Coord(Body[0]);
         CurrentDirection = _nextDirection;
